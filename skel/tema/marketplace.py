@@ -5,6 +5,7 @@ Computer Systems Architecture Course
 Assignment 1
 March 2021
 """
+from threading import Lock, currentThread
 
 
 class Marketplace:
@@ -19,13 +20,27 @@ class Marketplace:
         :type queue_size_per_producer: Int
         :param queue_size_per_producer: the maximum size of a queue associated with each producer
         """
-        pass
+
+        self.queue_size_per_producer = queue_size_per_producer
+        self.id_producer_list = list()
+
+
+        self.lock_reg_prod = Lock()
+
 
     def register_producer(self):
         """
         Returns an id for the producer that calls this.
         """
-        pass
+        with self.lock_reg_prod:
+            if len(self.id_producer_list) == 0:
+                self.id_producer_list.append(0)
+                producer_id = 0
+            else:
+                producer_id = self.id_producer_list[len(self.id_producer_list) - 1] + 1
+                self.id_producer_list.append(producer_id)
+
+        return producer_id
 
     def publish(self, producer_id, product):
         """
