@@ -51,11 +51,8 @@ class Consumer(Thread):
                         ret = self.marketplace.add_to_cart(cart_id, ops["product"])
                     elif ops["type"] == "remove":
                         ret = self.marketplace.remove_from_cart(cart_id, ops["product"])
-                    
                     if ret is None or ret:
                         ops["quantity"] -= 1
                     else:
                         time.sleep(self.retry_wait_time)
             self.marketplace.place_order(cart_id)
-
-                

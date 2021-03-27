@@ -7,7 +7,6 @@ March 2021
 """
 from threading import Lock, currentThread
 
-
 class Marketplace:
     """
     Class that represents the Marketplace. It's the central part of the implementation.
@@ -34,6 +33,8 @@ class Marketplace:
         self.lock_reg_prod = Lock()
         self.lock_new_carts_count = Lock()
         self.lock_add_to_cart = Lock()
+        self.lock_print = Lock()
+
 
 
 
@@ -65,19 +66,17 @@ class Marketplace:
 
         :returns True or False. If the caller receives False, it should wait and then try again.
         """
-        id_producer = int(producer_id) 
-        if id_producer not in max_prod_for_a_producer.keys():
+        id_producer = int(producer_id)
+        if id_producer not in self.max_prod_for_a_producer.keys():
             self.max_prod_for_a_producer[id_producer] = 1
-        else: 
+        else:
             if self.max_prod_for_a_producer[id_producer] >= self.queue_size_per_producer:
                 return False
             self.max_prod_for_a_producer[id_producer] += 1
 
         self.products_in_marketplace.append(product)
         self.produc_producer_maping[product] = id_producer
-        
-        return True      
-
+        return True
 
     def new_cart(self):
         """
@@ -109,12 +108,9 @@ class Marketplace:
         with self.lock_add_to_cart:
             if product not in self.products_in_marketplace:
                 return False
-            
             self.max_prod_for_a_producer[self.produc_producer_maping[product]] -= 1
             self.products_in_marketplace.remove(product)
-        
         self.carts_dic[cart_id].append(product)
-
         return True
 
     def remove_from_cart(self, cart_id, product):
@@ -141,6 +137,11 @@ class Marketplace:
         :type cart_id: Int
         :param cart_id: id cart
         """
-        list_prod = self.carts_dic[cart_id]
+        list_prod = self.carts_dic.pop(cart_id, None)
+
+        for product in list_prod:
+            with self.lock_print:
+                print("{} bought {}".format(currentThread().getName(), product))
+
 
         return list_prod
