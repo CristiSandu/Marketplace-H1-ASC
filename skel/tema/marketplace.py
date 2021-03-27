@@ -23,6 +23,10 @@ class Marketplace:
 
         self.queue_size_per_producer = queue_size_per_producer
         self.id_producer_list = list()
+        self.max_prod_for_a_producer = dict()
+        self.products_in_marketplace = list()
+        self.produc_producer_maping = dict()
+
 
 
         self.lock_reg_prod = Lock()
@@ -32,6 +36,7 @@ class Marketplace:
         """
         Returns an id for the producer that calls this.
         """
+        producer_id = 0
         with self.lock_reg_prod:
             if len(self.id_producer_list) == 0:
                 self.id_producer_list.append(0)
@@ -54,7 +59,24 @@ class Marketplace:
 
         :returns True or False. If the caller receives False, it should wait and then try again.
         """
-        pass
+        id_producer = int(producer_id) 
+        if id_producer not in max_prod_for_a_producer.keys():
+            self.max_prod_for_a_producer[id_producer] = 1
+            
+        else: 
+            if self.max_prod_for_a_producer[id_producer] >= self.queue_size_per_producer:
+                return False
+            self.max_prod_for_a_producer[id_producer] += 1
+
+           
+
+        self.products_in_marketplace.append(product)
+        self.produc_producer_maping[product] = id_producer
+        
+        return True      
+
+        
+        
 
     def new_cart(self):
         """
