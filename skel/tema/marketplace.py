@@ -26,10 +26,16 @@ class Marketplace:
         self.max_prod_for_a_producer = dict()
         self.products_in_marketplace = list()
         self.produc_producer_maping = dict()
+        self.carts_dic = dict()
 
+        self.carts_count = 0
 
 
         self.lock_reg_prod = Lock()
+        self.lock_new_carts_count = Lock()
+        self.lock_add_to_cart = Lock()
+
+
 
 
     def register_producer(self):
@@ -62,21 +68,16 @@ class Marketplace:
         id_producer = int(producer_id) 
         if id_producer not in max_prod_for_a_producer.keys():
             self.max_prod_for_a_producer[id_producer] = 1
-            
         else: 
             if self.max_prod_for_a_producer[id_producer] >= self.queue_size_per_producer:
                 return False
             self.max_prod_for_a_producer[id_producer] += 1
-
-           
 
         self.products_in_marketplace.append(product)
         self.produc_producer_maping[product] = id_producer
         
         return True      
 
-        
-        
 
     def new_cart(self):
         """
@@ -84,7 +85,14 @@ class Marketplace:
 
         :returns an int representing the cart_id
         """
-        pass
+        with self.lock_new_carts_count:
+            self.carts_count += 1
+            cart_id = self.carts_count
+
+        self.carts_dic[cart_id] = []
+
+        return cart_id
+
 
     def add_to_cart(self, cart_id, product):
         """
@@ -98,7 +106,16 @@ class Marketplace:
 
         :returns True or False. If the caller receives False, it should wait and then try again
         """
-        pass
+        with self.lock_add_to_cart:
+            if product not in self.products_in_marketplace:
+                return False
+            
+            self.max_prod_for_a_producer[self.produc_producer_maping[product]] -= 1
+            self.products_in_marketplace.remove(product)
+        
+        self.carts_dic[cart_id].append(product)
+
+        return True
 
     def remove_from_cart(self, cart_id, product):
         """
@@ -110,7 +127,12 @@ class Marketplace:
         :type product: Product
         :param product: the product to remove from cart
         """
-        pass
+
+        self.carts_dic[cart_id].remove(product)
+        self.products_in_marketplace.append(product)
+
+        self.max_prod_for_a_producer[self.produc_producer_maping[product]] += 1
+
 
     def place_order(self, cart_id):
         """
@@ -119,4 +141,6 @@ class Marketplace:
         :type cart_id: Int
         :param cart_id: id cart
         """
-        pass
+        list_prod = self.carts_dic[cart_id]
+
+        return list_prod
