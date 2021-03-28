@@ -28,9 +28,19 @@ Test 9:		FAILED
 Starting test 10
 Finished test 10
 Test 10:		FAILED
-/usr/bin/python3: No module named pylint
+************* Module marketplace
+tema/marketplace.py:11:0: R0902: Too many instance attributes (11/10) (too-many-instance-attributes)
+
+------------------------------------------------------------------
+Your code has been rated at 9.90/10 (previous run: 9.90/10, +0.00)
+
 TIMEOUT. Tests exceeded maximum allowed time of 360
 
 Run pylint
 
-/usr/bin/python3: No module named pylint
+************* Module marketplace
+tema/marketplace.py:11:0: R0902: Too many instance attributes (11/10) (too-many-instance-attributes)
+
+------------------------------------------------------------------
+Your code has been rated at 9.90/10 (previous run: 9.90/10, +0.00)
+

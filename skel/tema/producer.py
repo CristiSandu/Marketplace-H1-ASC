@@ -42,12 +42,14 @@ class Producer(Thread):
         self.id_register_prod = self.marketplace.register_producer()
 
     def run(self):
-        while True:
+        while 1: #in a infinit loop
             for (id_product, cant_prod, wait_time) in self.products:
-                while cant_prod != 0:
+
+                while cant_prod != 0: #while the cant needed is not 0
                     ret = self.marketplace.publish(str(self.id_register_prod), id_product)
-                    if ret:
-                        time.sleep(wait_time)
+
+                    if ret: #if return true
+                        time.sleep(wait_time) #wait time and decrement cant_prod
                         cant_prod -= 1
-                    else:
+                    else:#else wait number of seconds
                         time.sleep(self.republish_wait_time)
