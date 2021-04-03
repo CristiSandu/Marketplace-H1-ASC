@@ -140,12 +140,11 @@ class Marketplace:
         :type cart_id: Int
         :param cart_id: id cart
         """
-        list_prod = self.carts_dic[cart_id] #save list of prodact of the given cart
 
-        for product in list_prod: #loop on list
+        for product in self.carts_dic[cart_id]: #loop on list
             with self.lock_place_order: #and print on of at the time
                 name = str(currentThread().getName())
                 prod = str(product)
                 print(name, "bought", prod)
 
-        return list_prod #return the list of products
+        return self.carts_dic[cart_id] #return the list of products
